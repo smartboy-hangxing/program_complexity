@@ -19,7 +19,7 @@ class DataVisualizationApp:
         self.button_frame.place(relx=0, rely=0, anchor=tk.NW)
 
         self.chart_frame = tk.Frame(self.master)
-        self.chart_frame.place(relx=0.1, rely=0.1, anchor=tk.NW)
+        self.chart_frame.place(relx=0.05, rely=0.15, anchor=tk.NW)
 
         self.dataframes = {}
         self.selected_dataframe = None
@@ -96,7 +96,8 @@ class DataVisualizationApp:
             self.ax.set_title("PMT", fontsize=14)
             self.ax.set_xlabel("", fontsize=12)
             self.ax.set_ylabel("", fontsize=12)
-            self.ax.set_yticks(range(0, 250, 50), fontsize=10)
+            self.ax.tick_params(axis='y', labelsize=10)
+            self.ax.set_yticks(range(0, 250, 50))
 
             # 重新绘制 Canvas
             self.canvas.draw()
