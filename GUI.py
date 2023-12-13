@@ -12,12 +12,6 @@ class DataVisualizationApp:
 
         self.style = ttk.Style()
 
-        self.load_button_frame = ttk.Frame(self.master)
-        self.load_button_frame.place(relx=0, rely=0, relwidth=0.1, relheight=0.05)
-
-        self.pmt_button_frame = ttk.Frame(self.master)
-        self.pmt_button_frame.place(relx=0, rely=0.06, relwidth=0.15, relheight=0.05)
-
         self.chart_frame = tk.Frame(self.master)
         self.chart_frame.place(relx=0.01, rely=0.1, relwidth=0.5, relheight=0.6)
 
@@ -36,11 +30,11 @@ class DataVisualizationApp:
         self.master.bind("<Configure>", self.on_window_resize)
 
     def create_widgets(self):
-        load_button = ttk.Button(self.load_button_frame, textvariable=self.load_button_text, command=self.load_files)
-        load_button.place(relx=0.1, rely=0.1, relwidth=0.8, relheight=0.8)
+        load_button = ttk.Button(self.master, textvariable=self.load_button_text, command=self.load_files)
+        load_button.place(relx=0.01, rely=0.01, relwidth=0.1, relheight=0.05)
 
-        pmt_button = ttk.Button(self.pmt_button_frame, textvariable=self.pmt_button_text, command=self.select_pmt_files)
-        pmt_button.place(relx=0.05, rely=0.1, relwidth=0.9, relheight=0.8)
+        pmt_button = ttk.Button(self.master, textvariable=self.pmt_button_text, command=self.select_pmt_files)
+        pmt_button.place(relx=0.12, rely=0.01, relwidth=0.15, relheight=0.05)
 
         # 设置按钮字体大小为相应比例
         font_size = int(self.master.winfo_width() * 0.01)
@@ -78,12 +72,15 @@ class DataVisualizationApp:
         self.load_button_text.set("文件已加载")
 
     def select_pmt_files(self):
-        self.pmt_menu = tk.Menu(self.pmt_button_frame, tearoff=0)
+        self.pmt_menu = tk.Menu(self.master, tearoff=0)
         for file_name in self.dataframes.keys():
             self.pmt_menu.add_command(label=file_name, command=lambda name=file_name: self.select_pmt_file(name))
         self.pmt_menu.add_command(label="全部", command=lambda: self.select_pmt_file("全部"))
-        self.pmt_button_text.set("请选择PMT文件")
-        self.pmt_menu.post(self.pmt_button_frame.winfo_rootx(), self.pmt_button_frame.winfo_rooty() + self.pmt_button_frame.winfo_height())
+
+        # 在调用post之前将坐标转换为整数
+        x = int(self.master.winfo_rootx() + self.master.winfo_width() * 0.12)
+        y = int(self.master.winfo_rooty() + self.master.winfo_height() * 0.01)
+        self.pmt_menu.post(x, y)
 
     def select_pmt_file(self, name):
         self.selected_dataframe = None if name == "全部" else self.dataframes.get(name)
