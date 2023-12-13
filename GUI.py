@@ -86,22 +86,32 @@ class DataVisualizationApp:
         self.selected_dataframe = None if name == "全部" else self.dataframes.get(name)
         self.update_chart()
 
+    def load_files(self):
+        file_paths = filedialog.askopenfilenames(filetypes=[("Excel files", "*.xlsx;*.xls"), ("All files", "*.*")])
+        if file_paths:
+            for file_path in file_paths:
+                file_name = file_path.split("/")[-1].split(".")[0]
+                try:
+                    df = pd.read_excel(file_path)
+                    df['File'] = file_name  # 添加一个名为 'File' 的列
+                    self.dataframes[file_name] = df
+                except Exception as e:
+                    print(f"加载文件时出错 {file_name}: {e}")
+
+            self.update_combobox_values()
+
     def update_chart(self):
         self.ax.clear()
 
         window_width = self.chart_frame.winfo_width()
         window_height = self.chart_frame.winfo_height()
 
-        if self.selected_dataframe is not None:
-            complexity_data = self.selected_dataframe["复杂度"].iloc[-1]
-
-            if len(self.dataframes) > 1:  # 多个文件
-                index = np.arange(len(self.dataframes))
-                self.ax.bar(index, complexity_data, align='center', color='skyblue', edgecolor='black', linewidth=1.5)
-                self.ax.set_xticks([])  # 不显示横轴标签
-            else:  # 单个文件
-                bar_width = window_width / 4
-                self.ax.bar([0], complexity_data, width=bar_width, align='center', color='skyblue', edgecolor='black', linewidth=1.5)
+        if self.selected_dataframe is not None and len(self.dataframes) > 1:  # 显示单个文件复杂度
+            complexity_data = self.selected_dataframe["复杂度"]
+            x_value = 1  # 使用固定的值，比如1
+            self.ax.plot(x_value, complexity_data.iloc[-1], marker='o', linestyle='-', color='skyblue', markeredgecolor='black', linewidth=1.5)
+            self.ax.set_xticks([x_value])
+            self.ax.set_xticklabels([self.selected_dataframe['File'].iloc[-1]])  # 使用新添加的 'File' 列
 
             self.ax.set_title("PMT", fontsize=14)
             self.ax.set_xlabel("", fontsize=12)
@@ -112,10 +122,14 @@ class DataVisualizationApp:
         elif not self.dataframes:
             return
 
-        else:  # 显示全部文件
-            for file_name, df in self.dataframes.items():
-                complexity_data = df["复杂度"].iloc[-1]
-                self.ax.bar(file_name, complexity_data, label=file_name, color='skyblue', edgecolor='black', linewidth=1.5)
+        else:  # 显示全部文件复杂度
+            for i, (file_name, df) in enumerate(self.dataframes.items()):
+                complexity_data = df["复杂度"]
+                x_value = i + 1  # 使用不同的 x 轴值，以防止重叠
+                self.ax.plot(x_value, complexity_data.iloc[-1], label=file_name, marker='o', linestyle='-', linewidth=1.5)
+
+            self.ax.set_xticks(list(range(1, len(self.dataframes) + 1)))
+            self.ax.set_xticklabels(list(self.dataframes.keys()))  # 设置 x 轴标签
 
             self.ax.set_title("PMT", fontsize=14)
             self.ax.set_xlabel("", fontsize=12)
