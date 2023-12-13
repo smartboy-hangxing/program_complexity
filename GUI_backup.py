@@ -3,7 +3,6 @@ from tkinter import filedialog, ttk
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import numpy as np
 
 class DataVisualizationApp:
     def __init__(self, master):
@@ -16,10 +15,10 @@ class DataVisualizationApp:
                   background=[('pressed', '!disabled', 'gray'), ('active', 'black')])
 
         self.button_frame = tk.Frame(self.master)
-        self.button_frame.place(relx=0, rely=0, anchor=tk.NW, x=10, y=10)
+        self.button_frame.pack(side=tk.TOP, anchor=tk.NW, padx=10, pady=10)
 
         self.chart_frame = tk.Frame(self.master, width=self.master.winfo_width() / 2, height=self.master.winfo_height() * 2 / 5)
-        self.chart_frame.place(relx=0, rely=0, anchor=tk.NW, x=10, y=100)
+        self.chart_frame.pack(side=tk.LEFT, anchor=tk.NW, padx=10, pady=10)
 
         self.dataframes = {}
         self.selected_dataframe = None
@@ -31,11 +30,11 @@ class DataVisualizationApp:
 
     def create_widgets(self):
         load_button = ttk.Button(self.button_frame, textvariable=self.load_button_text, command=self.load_files)
-        load_button.place(relx=0, rely=0, anchor=tk.NW, x=10, y=5)
+        load_button.pack(side=tk.TOP, padx=10, pady=5)
 
         self.pmt_combobox = ttk.Combobox(self.button_frame, state="readonly")
         self.pmt_combobox.set("请选择PMT文件")
-        self.pmt_combobox.place(relx=0, rely=0, anchor=tk.NW, x=10, y=35)
+        self.pmt_combobox.pack(side=tk.TOP, padx=10, pady=5)
         self.pmt_combobox.bind("<<ComboboxSelected>>", self.on_combobox_selected)
 
     def load_files(self):
@@ -83,12 +82,13 @@ class DataVisualizationApp:
             plt.figure(figsize=figsize)
 
             if len(self.dataframes) > 1:  # Multiple files
-                index = np.arange(len(self.dataframes))
-                plt.bar(index, complexity_data, align='center', color='skyblue', edgecolor='black', linewidth=1.5)
-                plt.xticks([])  # 不显示横轴标签
+                bar_width = window_width / 3
+                index = 0  # Single bar for the selected file
+                plt.bar(index, complexity_data, width=bar_width, align='center', color='skyblue')
+                plt.xticks([index], [self.pmt_combobox.get()])
             else:  # Single file
-                bar_width = window_width / 4
-                plt.bar([0], complexity_data, width=bar_width, align='center', color='skyblue', edgecolor='black', linewidth=1.5)
+                bar_width = window_width / 3
+                plt.bar([0], complexity_data, width=bar_width, align='center', color='skyblue')
 
             plt.title("PMT", fontsize=14)
             plt.xlabel("", fontsize=12)
@@ -116,7 +116,7 @@ class DataVisualizationApp:
 
         for file_name, df in self.dataframes.items():
             complexity_data = df["复杂度"].iloc[-1]
-            ax.bar(file_name, complexity_data, label=file_name, color='skyblue', edgecolor='black', linewidth=1.5)
+            ax.bar(file_name, complexity_data, label=file_name)
 
         ax.set_title("PMT", fontsize=14)
         ax.set_xlabel("", fontsize=12)
@@ -124,8 +124,6 @@ class DataVisualizationApp:
         ax.legend()
         ax.set_yticks(range(0, 250, 50))
         ax.tick_params(axis='y', labelsize=10)
-
-        plt.tight_layout()
 
         canvas = FigureCanvasTkAgg(plt.gcf(), master=self.chart_frame)
         canvas.draw()
