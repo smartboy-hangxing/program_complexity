@@ -26,7 +26,7 @@ class DataVisualizationApp:
 
         self.create_widgets()
 
-        # 绑定窗口大小变化事件
+        # 实现窗口拖动大小
         self.master.bind("<Configure>", self.on_window_resize)
 
     def create_widgets(self):
@@ -36,20 +36,20 @@ class DataVisualizationApp:
         pmt_button = ttk.Button(self.master, textvariable=self.pmt_button_text, command=self.select_pmt_files)
         pmt_button.place(relx=0.12, rely=0.01, relwidth=0.15, relheight=0.05)
 
-        # 设置按钮字体大小为相应比例
+        # 按钮字体大小和窗口大小绑定
         font_size = int(self.master.winfo_width() * 0.01)
         self.style.configure("TButton", font=('Helvetica', font_size))
 
-        # 创建 Figure 和 Axes 对象
+        # Figure 和 Axes 对象
         self.fig, self.ax = plt.subplots(figsize=(3, 3), tight_layout=True)
 
-        # 创建 Canvas 对象，用于显示图表
+        # Canvas 对象，用于显示图表
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.chart_frame)
         self.canvas.draw()
         self.canvas.get_tk_widget().place(relx=0.01, rely=0.1, relwidth=0.8, relheight=0.8)
 
     def on_window_resize(self, event):
-        # 窗口大小变化时调整按钮字体大小
+        # 窗口大小变化时调整按钮字体大小，和上述重复
         font_size = int(self.master.winfo_width() * 0.01)
         self.style.configure("TButton", font=('Helvetica', font_size))
 
@@ -106,7 +106,7 @@ class DataVisualizationApp:
         window_width = self.chart_frame.winfo_width()
         window_height = self.chart_frame.winfo_height()
 
-        if self.selected_dataframe is not None and len(self.dataframes) > 1:  # 显示单个文件复杂度
+        if self.selected_dataframe is not None and len(self.dataframes) > 1:  # 显示单个文件的复杂度
             complexity_data = self.selected_dataframe["复杂度"]
             x_value = 1  # 使用固定的值，比如1
             self.ax.plot(x_value, complexity_data.iloc[-1], marker='o', linestyle='-', color='skyblue', markeredgecolor='black', linewidth=1.5)
@@ -122,7 +122,7 @@ class DataVisualizationApp:
         elif not self.dataframes:
             return
 
-        else:  # 显示全部文件复杂度
+        else:  # 显示全部文件的复杂度
             for i, (file_name, df) in enumerate(self.dataframes.items()):
                 complexity_data = df["复杂度"]
                 x_value = i + 1  # 使用不同的 x 轴值，以防止重叠
