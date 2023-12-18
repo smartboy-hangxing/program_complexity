@@ -117,7 +117,7 @@ class DataVisualizationApp:
             self.ax.set_xlabel("", fontsize=12)
             self.ax.set_ylabel("", fontsize=12)
             self.ax.tick_params(axis='y', labelsize=10)
-            self.ax.set_yticks(range(0, 250, 50))
+            self.ax.set_yticks(range(0, 250, 25))
 
         elif not self.dataframes:
             return
@@ -135,7 +135,7 @@ class DataVisualizationApp:
             self.ax.set_xlabel("", fontsize=12)
             self.ax.set_ylabel("", fontsize=12)
             self.ax.legend()
-            self.ax.set_yticks(range(0, 250, 50))
+            self.ax.set_yticks(range(0, 250, 25))
             self.ax.tick_params(axis='y', labelsize=10)
 
         # 重新绘制 Canvas
